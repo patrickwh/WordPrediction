@@ -9,11 +9,11 @@ class PredictorGUI:
         inputStr = self.acceptSentence.get()
         prediction=self.model.getPrediction(inputStr)
         self.backoffDis.delete(0, END)
-        self.backoffDis.insert(END, prediction[1])
+        self.backoffDis.insert(END, prediction[0])
         self.linearDis.delete(0, END)
-        self.linearDis.insert(END, prediction[2])
+        self.linearDis.insert(END, prediction[1])
         self.posDis.delete(0, END)
-        self.posDis.insert(END, prediction[3])
+        self.posDis.insert(END, prediction[2])
        
     def __init__(self,model):
         self.model = model

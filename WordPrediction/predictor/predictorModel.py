@@ -48,7 +48,7 @@ class PredictorModel:
             else:
                 return brown.words(categories=genre)
         if corpus=='emma':
-            words = gutenberg.words('shakespeare-all.txt')
+            words = gutenberg.words('AllText.txt')
             if tagged:
                 return self.tokensFromFile(corpus+"_tag"+".dat")
             else:
@@ -97,19 +97,16 @@ class PredictorModel:
         return guess
     
     
-    def getBackoffGuess(self):
+    def backoffGuess(self):
         guess = ''
         try:
             guess = self.getFreqGuess(self.tricfd[self.word2,self.word1])
-            print("Backoff Trigram")
         except ValueError:
             try:
                 guess = self.getFreqGuess(self.bicfd[self.word1])
-                print("Backoff Bigram")
             except ValueError:
                 try:
-                    guess = self.getFreqGuess()
-                    print("Backoff Unigram")
+                    guess = self.getFreqGuess(self.unifd)
                 except ValueError:
                     print("Backoff No matches")
         return guess
@@ -165,12 +162,12 @@ class PredictorModel:
             self.chars = t[l-1][0]
     
         print(inputStr)
-        backoff=self.getBackoffGuess()   
+        backoff=self.backoffGuess()   
         linear=self.linearGuess()
         posguess=self.posGuess()
         return (backoff,linear,posguess)
     
-    def testModel(self):
+    def testModel(self,type):
         'test the accuracy of the model'
         try:
             fp = open('test.txt','r')
@@ -178,6 +175,11 @@ class PredictorModel:
             fp.close()
             tokens = nltk.word_tokenize(testStrng)
             tlen = len(tokens)
+            
+        except Exception:
+            print('ERROR')
+
+        if type=='linear':
             alphas = 0.6
             alphasp = 0.05
             alphae = 0.9
@@ -196,14 +198,38 @@ class PredictorModel:
                         self.word1 = tokens[i]
                         self.word2 = tokens[i+1]
                         self.chars = ""
-                        predict = self.linearGuess()
+                        predict = self.linearGuess(alpha,beta,gamma)
                         if (predict == tokens[i+2]):
                             print(i,' ',self.word1,' ',self.word2,' ',predict)
                             sum += 1
                     print(alpha,'' ,beta,' ',gamma,' ',sum)
                     print(sum/(tlen-2))
-        except Exception:
-            print('ERROR')
+        
+        elif type=='test':
+            lsum = 0
+            bsum = 0
+            psum = 0
+            for i in range(tlen-2):
+                self.word1 = tokens[i]
+                self.word2 = tokens[i+1]
+                self.chars = ""
+                lp = self.linearGuess()
+                bp = self.backoffGuess()
+                pp = self.posGuess()
+                correct = False
+                if  lp == tokens[i+2]:
+                    correct = True
+                    lsum += 1
+                if bp == tokens[i+2]:
+                    correct = True
+                    bsum += 1
+                if pp == tokens[i+2]:
+                    correct = True
+                    psum += 1
+                if correct:
+                    print(self.word1,' ',self.word2,' ',lp,' ',bp,' ',pp,' ',tokens[i+2])
+            print('linear: ',lsum,' ',(lsum/(tlen-2)),'backoff: ',bsum,' ',(bsum/(tlen-2)),\
+                  'pos: ',psum,' ',(psum/(tlen-2)))
         
         
         
