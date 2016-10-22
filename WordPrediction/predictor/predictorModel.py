@@ -96,12 +96,9 @@ class PredictorModel:
             except:
                 bi=0
         try:
-            uni = self.unitaggedprob.prob(w0,t1)
+            uni = self.unipd.prob(w0)
         except:
-            try:
-                uni = self.unipd.prob(w0)
-            except:
-                uni = 0
+            uni = 0
         tmp = alpha*tri + beta*bi + gamma*uni
         return tmp
     
