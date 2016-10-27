@@ -8,8 +8,8 @@ class LanguageModel:
     
     def __init__(self):
         self.train()
-        #print(self.simple_linear_interpolation('about', 'fallout'))
-        #print(self.pos_tagged_linear_interpolation('about', 'ADP', 'fallout', 'NOUN'))
+        #print(self.simple_linear_interpolation('and', 'shook'))
+        #print(self.pos_tagged_linear_interpolation('and', 'CC', 'shook', ''))
         
     def train(self):
         print('Training...')
@@ -28,21 +28,20 @@ class LanguageModel:
         uni_fd = nltk.FreqDist()
         wordtag_uni_fd= nltk.FreqDist()
 
-        genres = ['austen-emma.txt', 'austen-persuasion.txt', 'austen-sense.txt', 'bible-kjv.txt',
-        'blake-poems.txt', 'bryant-stories.txt', 'burgess-busterbrown.txt',
-        'carroll-alice.txt', 'chesterton-ball.txt', 'chesterton-brown.txt',
-        'chesterton-thursday.txt', 'edgeworth-parents.txt', 'melville-moby_dick.txt',
-        'milton-paradise.txt', 'shakespeare-caesar.txt', 'shakespeare-hamlet.txt',
-        'shakespeare-macbeth.txt', 'whitman-leaves.txt']
-
-        for genre in genres:
-            corpus = gutenberg.words(genre)
-            corpus = nltk.pos_tag(corpus)
+        genres = []
         
+        genres = ['news']
+        output = open('training_output.txt','w')
+        for i, genre in enumerate(genres):
+            print(repr(i+1) + '/' + repr(len(genres)))
+            corpus = brown.tagged_words(categories = genre)
+            size = int(len(corpus) * 0.99)
+            corpus = corpus[:size]
             trigrams = nltk.trigrams(corpus)
             bigrams = nltk.bigrams(corpus)
             
             for ((word2, tag2), (word1, tag1), (word0, tag0)) in trigrams:
+                output.write(repr((word2, tag2)) + ' ' + repr((word1, tag1)) + ' ' + repr((word0, tag0)))
                 tri_fd[word2, word1, word0] += 1      
                 tri_cfd[word2, word1][word0] += 1      
                 tag_tri_cfd[tag2, tag1][tag0] += 1
@@ -56,7 +55,7 @@ class LanguageModel:
             for ((word0, tag0)) in corpus:
                 uni_fd[word0] += 1      
                 wordtag_uni_fd[word0, tag0] += 1
- 
+        output.close()
         # n-gram probability distributions
         self.tri_cpd = nltk.ConditionalProbDist(tri_cfd, nltk.ELEProbDist)
         self.tri_pd = nltk.ELEProbDist(tri_fd)
@@ -115,18 +114,18 @@ class LanguageModel:
                 try:
                     tri = self.tricpd[w2, w1].prob(w0)
                 except:
-                    tri = 0.01
+                    tri = 0
             try:
                 bi = self.wordtag_bi_cpd[w1, t1].prob(w0)
             except:
                 try:
                     bi = self.bi_cpd[w1].prob(w0)
                 except:
-                    bi = 0.01
+                    bi = 0
             try:
                 uni = self.uni_pd.prob(w0)
             except:
-                uni = 0.01
+                uni = 0
                 
             tmp = alpha * tri + beta * bi + gamma * uni    
             if (tmp > best):
