@@ -1,9 +1,7 @@
-from predictor.predictorGUI import PredictorGUI
-from predictor.predictorModel import PredictorModel
+from LanguageModel import LanguageModel
+from Tester import Tester
 
 if __name__=='__main__':
-    model = PredictorModel()
-    model.testModel('compare','test4')
-    # model.testModel('linear_parameter','test4')
-    gui = PredictorGUI(model)
-    gui.show()
+    model = LanguageModel()
+    tester = Tester()
+    tester.run(model)
