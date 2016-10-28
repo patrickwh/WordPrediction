@@ -10,7 +10,7 @@ class LanguageModelB:
         self.train()
         
     def train(self):
-        print('Training...')
+        print('Training model B...')
         
         tri_fd = nltk.FreqDist()
         tri_cfd = nltk.ConditionalFreqDist()
@@ -18,7 +18,7 @@ class LanguageModelB:
         bi_cfd = nltk.ConditionalFreqDist()
         uni_fd = nltk.FreqDist()
         
-        genres = ['adventure']
+        genres = ['news', 'religion', 'reviews', 'romance', 'science_fiction']
 
         for genre in genres:
             
@@ -40,13 +40,13 @@ class LanguageModelB:
                 uni_fd[word0] += 1      
             
         # n-gram probability distributions
-        self.tri_cpd = nltk.ConditionalProbDist(tri_cfd, nltk.LaplaceProbDist)
-        self.tri_pd = nltk.SimpleGoodTuringProbDist(tri_fd)
+        self.tri_cpd = nltk.ConditionalProbDist(tri_cfd, nltk.ELEProbDist)
+        self.tri_pd = nltk.ELEProbDist(tri_fd)
         
-        self.bi_cpd = nltk.ConditionalProbDist(bi_cfd, nltk.LaplaceProbDist)
-        self.bi_pd = nltk.SimpleGoodTuringProbDist(bi_fd)
+        self.bi_cpd = nltk.ConditionalProbDist(bi_cfd, nltk.ELEProbDist)
+        self.bi_pd = nltk.ELEProbDist(bi_fd)
         
-        self.uni_pd = nltk.SimpleGoodTuringProbDist(uni_fd)
+        self.uni_pd = nltk.ELEProbDist(uni_fd)
 
         print('Done!')
         
@@ -56,8 +56,13 @@ class LanguageModelB:
         beta = 0.25
         gamma = 0.15
 
-        best = 0
-        word = 'default'
+        score_1 = -1
+        score_2 = -1
+        score_3 = -1
+
+        word_1 = 'none'
+        word_2 = 'none'
+        word_3 = 'none'
         
         for w0 in self.uni_pd.samples():
             try:
@@ -71,11 +76,19 @@ class LanguageModelB:
                 
             uni = self.uni_pd.prob(w0)
             tmp = alpha * tri + beta * bi + gamma * uni
-            if (tmp > best):
-                word = w0
-                best = tmp
+            if tmp > score_3:
+                if tmp > score_2:
+                    if tmp > score_1:
+                        word_1 = w0
+                        score_1 = tmp
+                    else:
+                        word_2 = w0
+                        score_2 = tmp
+                else:
+                    word_3 = w0
+                    score_3 = tmp
 
-        return word
+        return word_1, word_2, word_3
     
     def get_score(self, w2, t2, w1, t1, w0, t0):
         

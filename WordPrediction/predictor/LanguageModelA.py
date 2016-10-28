@@ -10,7 +10,7 @@ class LanguageModelA:
         self.train()
         
     def train(self):
-        print('Training...')
+        print('Training model A...')
 
         tri_cfd = nltk.ConditionalFreqDist()
         bi_cfd = nltk.ConditionalFreqDist()
@@ -20,7 +20,7 @@ class LanguageModelA:
         wordtag_bi_cfd = nltk.ConditionalFreqDist()
         wordtag_uni_fd= nltk.FreqDist()
         
-        genres = ['adventure', 'belles_lettres']
+        genres = ['news', 'religion', 'reviews', 'romance', 'science_fiction']
         
         for genre in genres:
 
@@ -45,22 +45,28 @@ class LanguageModelA:
         # n-gram probability distributions
         self.tri_cpd = nltk.ConditionalProbDist(tri_cfd, nltk.ELEProbDist)
         self.bi_cpd = nltk.ConditionalProbDist(bi_cfd, nltk.ELEProbDist)
-        self.uni_pd = nltk.SimpleGoodTuringProbDist(uni_fd)
+        self.uni_pd = nltk.ELEProbDist(uni_fd)
         
         # POS n-gram
-        self.wordtag_uni_pd = nltk.SimpleGoodTuringProbDist(wordtag_uni_fd)
+        self.wordtag_uni_pd = nltk.ELEProbDist(wordtag_uni_fd)
         self.wordtag_bi_cpd = nltk.ConditionalProbDist(wordtag_bi_cfd, nltk.ELEProbDist)
         self.wordtag_tri_cpd = nltk.ConditionalProbDist(wordtag_tri_cfd, nltk.ELEProbDist)
         
         print('Done!')
         
     def pos_tagged_linear_interpolation(self, w2, t2, w1, t1):
+        
         alpha=0.6
         beta=0.25
         gamma=0.15
         
-        best = 0
-        word = 'default'
+        score_1 = -1
+        score_2 = -1
+        score_3 = -1
+
+        word_1 = 'none'
+        word_2 = 'none'
+        word_3 = 'none'
 
         for (w0, t0) in self.wordtag_uni_pd.samples():
             try:
@@ -83,11 +89,19 @@ class LanguageModelA:
                 uni = 0
                 
             tmp = alpha * tri + beta * bi + gamma * uni    
-            if (tmp > best):
-                word = w0
-                best = tmp
+            if tmp > score_3:
+                if tmp > score_2:
+                    if tmp > score_1:
+                        word_1 = w0, t0
+                        score_1 = tmp
+                    else:
+                        word_2 = w0, t0
+                        score_2 = tmp
+                else:
+                    word_3 = w0, t0
+                    score_3 = tmp           
         
-        return word
+        return word_1, word_2, word_3
 
     def get_score(self, w2, t2, w1, t1, w0, t0):
         alpha=0.6
