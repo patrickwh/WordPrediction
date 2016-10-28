@@ -63,8 +63,11 @@ class LanguageModelB:
         word_1 = 'none'
         word_2 = 'none'
         word_3 = 'none'
+        stop_words = {'the', 'a', ',', '.'}
         
         for w0 in self.uni_pd.samples():
+            if w0 in stop_words:
+                continue
             try:
                 tri = self.tri_cpd[w2, w1].prob(w0)
             except:

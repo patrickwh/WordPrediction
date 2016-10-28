@@ -67,8 +67,10 @@ class LanguageModelA:
         word_1 = 'none'
         word_2 = 'none'
         word_3 = 'none'
-
+        stop_words = {'the', 'a', ',', '.'}
         for (w0, t0) in self.wordtag_uni_pd.samples():
+            if w0 in stop_words:
+                continue
             try:
                 tri = self.wordtag_tri_cpd[w2, t2, w1, t1].prob(w0)
             except:
