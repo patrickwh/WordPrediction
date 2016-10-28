@@ -67,7 +67,7 @@ class LanguageModelA:
         word_1 = 'none'
         word_2 = 'none'
         word_3 = 'none'
-        stop_words = {'the', 'a', ',', '.'}
+        stop_words = {'the', 'a', ',', '.', '``'}
         for (w0, t0) in self.wordtag_uni_pd.samples():
             if w0 in stop_words:
                 continue

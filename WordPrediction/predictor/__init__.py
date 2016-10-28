@@ -17,6 +17,7 @@ if __name__=='__main__':
         if(text[0] != 1):
             text = nltk.pos_tag(text)
             print('Entered ' + repr(text))
+            print(' ')
             print('Guessing next word...')
             size = len(text)
             print('POS tagged model said: ' + repr(model_a.pos_tagged_linear_interpolation(
