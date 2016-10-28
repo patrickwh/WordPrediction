@@ -43,14 +43,14 @@ class LanguageModelA:
                 wordtag_uni_fd[word0, tag0] += 1
 
         # n-gram probability distributions
-        self.tri_cpd = nltk.ConditionalProbDist(tri_cfd, nltk.ELEProbDist)
-        self.bi_cpd = nltk.ConditionalProbDist(bi_cfd, nltk.ELEProbDist)
-        self.uni_pd = nltk.ELEProbDist(uni_fd)
+        self.tri_cpd = nltk.ConditionalProbDist(tri_cfd, nltk.LaplaceProbDist)
+        self.bi_cpd = nltk.ConditionalProbDist(bi_cfd, nltk.LaplaceProbDist)
+        self.uni_pd = nltk.LaplaceProbDist(uni_fd)
         
         # POS n-gram
-        self.wordtag_uni_pd = nltk.ELEProbDist(wordtag_uni_fd)
-        self.wordtag_bi_cpd = nltk.ConditionalProbDist(wordtag_bi_cfd, nltk.ELEProbDist)
-        self.wordtag_tri_cpd = nltk.ConditionalProbDist(wordtag_tri_cfd, nltk.ELEProbDist)
+        self.wordtag_uni_pd = nltk.LaplaceProbDist(wordtag_uni_fd)
+        self.wordtag_bi_cpd = nltk.ConditionalProbDist(wordtag_bi_cfd, nltk.LaplaceProbDist)
+        self.wordtag_tri_cpd = nltk.ConditionalProbDist(wordtag_tri_cfd, nltk.LaplaceProbDist)
         
         print('Done!')
         
@@ -67,7 +67,10 @@ class LanguageModelA:
         word_1 = 'none'
         word_2 = 'none'
         word_3 = 'none'
-        stop_words = {'the', 'a', ',', '.', '``'}
+        stop_words = {'the', 'a', ',', '.', '``', 'and', 'of', '""', 'of', 'that'}
+        
+
+        
         for (w0, t0) in self.wordtag_uni_pd.samples():
             if w0 in stop_words:
                 continue
