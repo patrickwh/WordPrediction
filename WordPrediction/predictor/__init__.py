@@ -1,7 +1,14 @@
-from LanguageModel import LanguageModel
+from LanguageModelA import LanguageModelA
+from LanguageModelB import LanguageModelB
 from Tester import Tester
 
 if __name__=='__main__':
-    model = LanguageModel()
+    #model_a = LanguageModelA()
+    model_b = LanguageModelB()
+    
     tester = Tester()
-    tester.run(model)
+    #print('Lang model A')
+    #tester.run(model_a)
+
+    print('Lang model B')
+    tester.run(model_b)

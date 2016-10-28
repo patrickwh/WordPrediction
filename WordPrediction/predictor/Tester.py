@@ -1,4 +1,5 @@
 import nltk
+import math
 from nltk.corpus import brown
 
 class Tester:
@@ -8,30 +9,24 @@ class Tester:
     
     def run(self, model):
         print('Testing...')
-        
-        score_simple_linear = 0
-        score_pos_tagged_linear = 0
-        
-        genres = ['news']
-        output = open('testing_output.txt','w')
+
+        perplexity = 1
+
+        genres = ['adventure', 'belles_lettres', 'editorial', 'fiction', 'government', 'hobbies',
+            'humor', 'learned', 'lore', 'mystery', 'news', 'religion', 'reviews', 'romance',
+            'science_fiction']
+        total = 0
         for i, genre in enumerate(genres):
             print(repr(i+1) + '/' + repr(len(genres)))
             corpus = brown.tagged_words(categories = genre)
-            size = int(len(corpus) * 0.99)
+            size = int(len(corpus) * 0.90)
             corpus = corpus[size:]
             trigrams = nltk.trigrams(corpus)
-            
-            word = ''
-            total = 0
 
             for ((word2, tag2), (word1, tag1), (word0, tag0)) in trigrams:
-                output.write(repr((word2, tag2)) + ' ' + repr((word1, tag1)) + ' ' + repr((word0, tag0)))
                 total += 1
-                if(model.simple_linear_interpolation(word2, word1) == word0):
-                    score_simple_linear += 1
-
-                if(model.pos_tagged_linear_interpolation(word2, tag2, word1, tag1) == word0):
-                    score_pos_tagged_linear += 1
-        output.close()
-        print(score_simple_linear / total)
-        print(score_pos_tagged_linear / total)
+                score = model.get_score(word2, tag2, word1, tag1, word0, tag0)
+                perplexity += math.log(score, 2)
+        perplexity = perplexity / total
+        perplexity = math.pow(2, -perplexity)
+        print(perplexity)        
