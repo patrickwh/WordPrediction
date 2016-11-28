@@ -78,7 +78,7 @@ class LanguageModelA:
                 tri = self.wordtag_tri_cpd[w2, t2, w1, t1].prob(w0)
             except:
                 try:
-                    tri = self.tricpd[w2, w1].prob(w0)
+                    tri = self.tri_cpd[w2, w1].prob(w0)
                 except:
                     tri = 0
             try:

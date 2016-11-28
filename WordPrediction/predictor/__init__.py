@@ -22,7 +22,7 @@ if __name__=='__main__':
             size = len(text)
             print('POS tagged model said: ' + repr(model_a.pos_tagged_linear_interpolation(
                 text[size-2][0], text[size-2][1], text[size-1][0], text[size-1][1])))
-            print('Simple LI model said: ' + repr(model_b.simple_linear_interpolation(text[size-4], text[size-2])))
+            print('Simple LI model said: ' + repr(model_b.simple_linear_interpolation(text[size-2][0], text[size-1][0])))
     print('Good bye...')
         
     #tester = Tester()
